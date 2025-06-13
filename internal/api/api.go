@@ -3,9 +3,8 @@ package api
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-
-	"simple-service/internal/api/middleware"
-	"simple-service/internal/service"
+	"trainee/internal/api/middleware"
+	"trainee/internal/service"
 )
 
 // Routers - структура для хранения зависимостей роутов
@@ -30,6 +29,9 @@ func NewRouters(r *Routers, token string) *fiber.App {
 
 	// Роут для создания задачи
 	apiGroup.Post("/create_task", r.Service.CreateTask)
+
+	// Роут для получения задачи
+	apiGroup.Get("/task/:id", r.Service.GetTask)
 
 	return app
 }

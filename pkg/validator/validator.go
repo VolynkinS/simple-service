@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"regexp"
+	"strconv"
 
 	"github.com/go-playground/validator"
 )
@@ -20,6 +21,7 @@ const (
 	ErrFieldExceedsMaxVal = "Field exceeds maximum value"
 	ErrFieldBelowMinVal   = "Field is below minimum value"
 	ErrUnknownValidation  = "Unknown validation error"
+	ErrInvalidIntID       = "Invalid int ID format"
 )
 
 func init() {
@@ -29,7 +31,7 @@ func init() {
 func New() *validator.Validate {
 	v := validator.New()
 	_ = v.RegisterValidation("tag", validateTag)
-
+	_ = v.RegisterValidation("intId", validateIntID)
 	return v
 }
 
@@ -44,6 +46,17 @@ func Validator() *validator.Validate {
 func validateTag(fl validator.FieldLevel) bool {
 	re, _ := regexp.Compile(`^#[a-z0-9_\-]+$`)
 	return re.MatchString(fl.Field().String())
+}
+
+func validateIntID(fl validator.FieldLevel) bool {
+	rawId := fl.Field().String()
+
+	_, err := strconv.Atoi(rawId)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func Validate(ctx context.Context, structure any) error {
@@ -75,6 +88,8 @@ func parseValidationErrors(err error) error {
 		validationErrorDescription = ErrFieldExceedsMaxVal
 	case "gt", "gte":
 		validationErrorDescription = ErrFieldBelowMinVal
+	case "intId":
+		validationErrorDescription = ErrInvalidIntID
 	default:
 		validationErrorDescription = ErrUnknownValidation
 	}

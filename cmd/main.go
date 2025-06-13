@@ -6,16 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"trainee/internal/api"
+	"trainee/internal/config"
+	customLogger "trainee/internal/logger"
+	"trainee/internal/repo"
+	"trainee/internal/service"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/pkg/errors"
-
-	"simple-service/internal/api"
-	"simple-service/internal/config"
-	customLogger "simple-service/internal/logger"
-	"simple-service/internal/repo"
-	"simple-service/internal/service"
 )
 
 func main() {

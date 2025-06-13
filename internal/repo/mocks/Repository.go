@@ -4,7 +4,7 @@ package mocks
 
 import (
 	context "context"
-	repo "simple-service/internal/repo"
+	"trainee/internal/repo"
 
 	mock "github.com/stretchr/testify/mock"
 )
