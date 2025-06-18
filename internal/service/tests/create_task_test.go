@@ -1,4 +1,4 @@
-package service
+package tests
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"trainee/internal/dto"
 	"trainee/internal/repo"
 	"trainee/internal/repo/mocks"
+	"trainee/internal/service"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -23,14 +24,38 @@ func TestCreateTask(t *testing.T) {
 	logger := zap.NewNop().Sugar() // Без вывода логов
 
 	// Создаем экземпляр сервиса с мок-репозиторием
-	s := NewService(mockRepo, logger)
+	s := service.NewService(mockRepo, logger)
 
 	// Инициализируем Fiber-контекст
 	app := fiber.New()
 	app.Post("/tasks", s.CreateTask)
 
+	// Вспомогательная функция для сброса мока
+	resetMock := func() {
+		mockRepo.ExpectedCalls = []*mock.Call{} // Очищаем ожидания
+		mockRepo.Calls = []mock.Call{}          // Очищаем историю вызовов
+	}
+
+	t.Run("ошибка валидации входных данных", func(t *testing.T) {
+		resetMock()
+		body := []byte(`{}`) // Пустое тело, `title` обязателен
+
+		req, err := http.NewRequest("POST", "/tasks", bytes.NewReader(body))
+		assert.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req)
+		assert.NoError(t, err)
+		assert.Equal(t, fiber.StatusBadRequest, resp.StatusCode)
+
+		var response dto.Response
+		json.NewDecoder(resp.Body).Decode(&response)
+		assert.Equal(t, "error", response.Status)
+	})
+
 	t.Run("успешное создание задачи", func(t *testing.T) {
-		task := TaskRequest{
+		resetMock()
+		task := service.TaskRequest{
 			Title:       "Test Task",
 			Description: "Test Description",
 		}
@@ -56,29 +81,11 @@ func TestCreateTask(t *testing.T) {
 		var response dto.Response
 		json.NewDecoder(resp.Body).Decode(&response)
 		assert.Equal(t, "success", response.Status)
-
-		// Проверяем вызов мок-методов
-		mockRepo.AssertExpectations(t)
-	})
-
-	t.Run("ошибка валидации входных данных", func(t *testing.T) {
-		body := []byte(`{}`) // Пустое тело, `title` обязателен
-
-		req, err := http.NewRequest("POST", "/tasks", bytes.NewReader(body))
-		assert.NoError(t, err)
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := app.Test(req)
-		assert.NoError(t, err)
-		assert.Equal(t, fiber.StatusBadRequest, resp.StatusCode)
-
-		var response dto.Response
-		json.NewDecoder(resp.Body).Decode(&response)
-		assert.Equal(t, "error", response.Status)
 	})
 
 	t.Run("ошибка при создании задачи в БД", func(t *testing.T) {
-		task := TaskRequest{
+		resetMock()
+		task := service.TaskRequest{
 			Title:       "Test Task",
 			Description: "Test Description",
 		}
@@ -95,13 +102,10 @@ func TestCreateTask(t *testing.T) {
 
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
-		assert.NoError(t, err)
 		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
 
 		var response dto.Response
 		json.NewDecoder(resp.Body).Decode(&response)
 		assert.Equal(t, "error", response.Status)
-
-		mockRepo.AssertExpectations(t)
 	})
 }

@@ -21,7 +21,7 @@ const (
 	ErrFieldExceedsMaxVal = "Field exceeds maximum value"
 	ErrFieldBelowMinVal   = "Field is below minimum value"
 	ErrUnknownValidation  = "Unknown validation error"
-	ErrInvalidIntID       = "Invalid int ID format"
+	ErrInvalidIntString   = "Invalid int format"
 )
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 func New() *validator.Validate {
 	v := validator.New()
 	_ = v.RegisterValidation("tag", validateTag)
-	_ = v.RegisterValidation("intId", validateIntID)
+	_ = v.RegisterValidation("intString", validateIntString)
 	return v
 }
 
@@ -48,7 +48,7 @@ func validateTag(fl validator.FieldLevel) bool {
 	return re.MatchString(fl.Field().String())
 }
 
-func validateIntID(fl validator.FieldLevel) bool {
+func validateIntString(fl validator.FieldLevel) bool {
 	rawId := fl.Field().String()
 
 	_, err := strconv.Atoi(rawId)
@@ -88,8 +88,8 @@ func parseValidationErrors(err error) error {
 		validationErrorDescription = ErrFieldExceedsMaxVal
 	case "gt", "gte":
 		validationErrorDescription = ErrFieldBelowMinVal
-	case "intId":
-		validationErrorDescription = ErrInvalidIntID
+	case "intString":
+		validationErrorDescription = ErrInvalidIntString
 	default:
 		validationErrorDescription = ErrUnknownValidation
 	}

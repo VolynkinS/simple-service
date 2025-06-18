@@ -8,12 +8,13 @@ import (
 )
 
 type TestStruct struct {
-	RequiredField string `validate:"required"`
-	TagField      string `validate:"tag"`
-	MaxField      string `validate:"max=5"`
-	MinField      string `validate:"min=3"`
-	LtField       int    `validate:"lt=10"`
-	GteField      int    `validate:"gte=5"`
+	RequiredField  string `validate:"required"`
+	TagField       string `validate:"tag"`
+	MaxField       string `validate:"max=5"`
+	MinField       string `validate:"min=3"`
+	LtField        int    `validate:"lt=10"`
+	GteField       int    `validate:"gte=5"`
+	IntStringField string `validate:"intString"`
 }
 
 func TestValidate(t *testing.T) {
@@ -25,7 +26,7 @@ func TestValidate(t *testing.T) {
 	}{
 		{
 			name:       "Valid struct",
-			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 5},
+			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 5, IntStringField: "-1"},
 			wantErr:    false,
 			wantErrMsg: "",
 		},
@@ -64,6 +65,12 @@ func TestValidate(t *testing.T) {
 			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 3},
 			wantErr:    true,
 			wantErrMsg: ErrFieldBelowMinVal + ": TestStruct.GteField",
+		},
+		{
+			name:       "Field string isnt int",
+			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 5, IntStringField: "-1.25"},
+			wantErr:    true,
+			wantErrMsg: ErrInvalidIntString + ": TestStruct.IntStringField",
 		},
 	}
 

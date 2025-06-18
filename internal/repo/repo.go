@@ -25,7 +25,7 @@ type repository struct {
 // Repository - интерфейс с методом создания задачи
 type Repository interface {
 	CreateTask(ctx context.Context, task Task) (int, error)
-	GetTask(ctx context.Context, id string) (Task, error) // Создание задачи
+	GetTask(ctx context.Context, id string) (*Task, error) // Создание задачи
 }
 
 // NewRepository - создание нового экземпляра репозитория с подключением к PostgreSQL
@@ -74,12 +74,12 @@ func (r *repository) CreateTask(ctx context.Context, task Task) (int, error) {
 }
 
 // GetTask - получение задачи из таблицы task по task.id
-func (r *repository) GetTask(ctx context.Context, id string) (Task, error) {
+func (r *repository) GetTask(ctx context.Context, id string) (*Task, error) {
 	task := Task{}
 	err := r.pool.QueryRow(ctx, getTaskQuery, id).
 		Scan(&task.ID, &task.Title, &task.Description, &task.Status, &task.Created_at, &task.Updated_at)
 	if err != nil {
-		return Task{}, errors.Wrap(err, "failed to get task")
+		return &Task{}, errors.Wrap(err, "failed to get task")
 	}
-	return task, nil
+	return &task, nil
 }

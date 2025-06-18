@@ -77,11 +77,12 @@ func (s *service) GetTask(ctx *fiber.Ctx) error {
 	}
 
 	// Получение задачи из БД через репозиторий
-	task, err := s.repo.GetTask(ctx.Context(), taskReq.ID)
+	taskPtr, err := s.repo.GetTask(ctx.Context(), taskReq.ID)
 	if err != nil {
 		s.log.Error("Failed to get task", zap.Error(err))
 		return dto.InternalServerError(ctx)
 	}
+	task := *taskPtr
 
 	// Формирование ответа
 	response := dto.Response{

@@ -7,5 +7,5 @@ type TaskRequest struct {
 }
 
 type TaskGetRequest struct {
-	ID string `validate:"required,intId"`
+	ID string `validate:"required,intString,min=1"`
 }
