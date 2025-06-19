@@ -82,13 +82,12 @@ func (s *service) GetTask(ctx *fiber.Ctx) error {
 		s.log.Error("Failed to get task", zap.Error(err))
 		return dto.InternalServerError(ctx)
 	}
-	task := *taskPtr
 
 	// Формирование ответа
 	response := dto.Response{
 		Status: "success",
-		Data: map[string]any{"id": task.ID, "title": task.Title, "description": task.Description,
-			"status": task.Status, "created_at": task.Created_at, "updated_at": task.Updated_at,
+		Data: map[string]any{"id": taskPtr.ID, "title": taskPtr.Title, "description": taskPtr.Description,
+			"status": taskPtr.Status, "created_at": taskPtr.Created_at, "updated_at": taskPtr.Updated_at,
 		},
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response)
