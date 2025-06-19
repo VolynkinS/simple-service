@@ -15,7 +15,8 @@ import (
 
 // SQL-запрос на вставку задачи
 const (
-	insertTaskQuery = `INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id;`
+	insertTaskQuery  = `INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id;`
+	getTaskByIdQuery = `SELECT id, title, description, status, created_at, updated_at FROM tasks WHERE id = $1;`
 )
 
 type repository struct {
@@ -25,6 +26,7 @@ type repository struct {
 // Repository - интерфейс с методом создания задачи
 type Repository interface {
 	CreateTask(ctx context.Context, task Task) (int, error) // Создание задачи
+	GetTaskById(ctx context.Context, id int) (*TaskWithAllColumns, error)
 }
 
 // NewRepository - создание нового экземпляра репозитория с подключением к PostgreSQL
@@ -70,4 +72,13 @@ func (r *repository) CreateTask(ctx context.Context, task Task) (int, error) {
 		return 0, errors.Wrap(err, "failed to insert task")
 	}
 	return id, nil
+}
+
+func (r *repository) GetTaskById(ctx context.Context, id int) (*TaskWithAllColumns, error) {
+	var taskWithAll TaskWithAllColumns = TaskWithAllColumns{}
+	err := r.pool.QueryRow(ctx, getTaskByIdQuery, id).Scan(&taskWithAll.Id, &taskWithAll.Title, &taskWithAll.Description, &taskWithAll.Status, &taskWithAll.CreatedAt, &taskWithAll.UpdatedAt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to bind task: %w", err)
+	}
+	return &taskWithAll, nil
 }

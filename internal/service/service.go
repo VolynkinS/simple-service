@@ -14,6 +14,7 @@ import (
 // Service - интерфейс для бизнес-логики
 type Service interface {
 	CreateTask(ctx *fiber.Ctx) error
+	GetTaskById(ctx *fiber.Ctx) error
 }
 
 type service struct {
@@ -62,4 +63,19 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (s *service) GetTaskById(ctx *fiber.Ctx) error {
+	idRequest, err := ctx.ParamsInt("id", 0)
+	if err != nil || idRequest < 1 {
+		return dto.BadResponseError(ctx, dto.FieldBadFormat, "Invalid id")
+	}
+
+	taskWithAll, err := s.repo.GetTaskById(ctx.Context(), idRequest)
+	if err != nil {
+		s.log.Error("Failed to get task", zap.Error(err))
+		return dto.InternalServerError(ctx)
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(*taskWithAll)
 }
