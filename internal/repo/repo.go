@@ -79,7 +79,7 @@ func (r *repository) GetTask(ctx context.Context, id string) (*Task, error) {
 	err := r.pool.QueryRow(ctx, getTaskQuery, id).
 		Scan(&task.ID, &task.Title, &task.Description, &task.Status, &task.Created_at, &task.Updated_at)
 	if err != nil {
-		return &Task{}, errors.Wrap(err, "failed to get task")
+		return nil, errors.Wrap(err, "failed to get task")
 	}
 	return &task, nil
 }
