@@ -30,6 +30,8 @@ func NewRouters(r *Routers, token string) *fiber.App {
 
 	// Роут для создания задачи
 	apiGroup.Post("/create_task", r.Service.CreateTask)
+	// Эндпоинт для получения задачи по id
+	apiGroup.Get("/task/:id", r.Service.GetTask)
 
 	return app
 }

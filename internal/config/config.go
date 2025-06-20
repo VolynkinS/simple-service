@@ -31,4 +31,6 @@ type PostgreSQL struct {
 	PoolMaxConns        int           `envconfig:"DB_POOL_MAX_CONNS" default:"5"`
 	PoolMaxConnLifetime time.Duration `envconfig:"DB_POOL_MAX_CONN_LIFETIME" default:"180s"`
 	PoolMaxConnIdleTime time.Duration `envconfig:"DB_POOL_MAX_CONN_IDLE_TIME" default:"100s"`
+
+	AutoMigrate bool `envconfig:"DB_AUTO_MIGRATE" default:"false"`
 }
