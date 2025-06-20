@@ -13,18 +13,20 @@ import (
 
 // Слой репозитория, здесь должны быть все методы, связанные с базой данных
 
-// SQL-запрос на вставку задачи
+// SQL-запросы
 const (
 	insertTaskQuery = `INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id;`
+	getTaskQuery    = `SELECT id, title, description, status, created_at, updated_at FROM tasks WHERE id = $1;`
 )
 
 type repository struct {
 	pool *pgxpool.Pool
 }
 
-// Repository - интерфейс с методом создания задачи
+// Repository - интерфейс с методами взаимодействия с задачами
 type Repository interface {
 	CreateTask(ctx context.Context, task Task) (int, error) // Создание задачи
+	GetTask(ctx context.Context, taskID int) (Task, error)  // Получение задачи
 }
 
 // NewRepository - создание нового экземпляра репозитория с подключением к PostgreSQL
@@ -70,4 +72,21 @@ func (r *repository) CreateTask(ctx context.Context, task Task) (int, error) {
 		return 0, errors.Wrap(err, "failed to insert task")
 	}
 	return id, nil
+}
+
+// GetTask - получение задачи из таблицы tasks
+func (r *repository) GetTask(ctx context.Context, taskID int) (Task, error) {
+	var task Task
+	err := r.pool.QueryRow(ctx, getTaskQuery, taskID).Scan(
+		&task.Id,
+		&task.Title,
+		&task.Description,
+		&task.Status,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+	)
+	if err != nil {
+		return Task{}, errors.Wrap(err, "failed to get task")
+	}
+	return task, nil
 }

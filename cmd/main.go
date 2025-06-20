@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"simple-service/migrations"
 	"syscall"
 
 	"github.com/joho/godotenv"
@@ -33,6 +34,13 @@ func main() {
 	logger, err := customLogger.NewLogger(cfg.LogLevel)
 	if err != nil {
 		log.Fatal(errors.Wrap(err, "error initializing logger"))
+	}
+
+	// Включаем/выключаем миграцию через .env
+	if cfg.PostgreSQL.AutoMigrate {
+		if err = migrations.ApplyMigrations(cfg.PostgreSQL); err != nil {
+			log.Fatal(errors.Wrap(err, "error while migrating database"))
+		}
 	}
 
 	// Подключение к PostgreSQL
