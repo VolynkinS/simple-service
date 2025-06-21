@@ -42,6 +42,17 @@ func (_m *Repository) CreateTask(ctx context.Context, task repo.Task) (int, erro
 	return r0, r1
 }
 
+func (_m *Repository) GetTaskById(ctx context.Context, id int) (repo.Task, error) {
+	ret := _m.Called(ctx, id)
+	var r0 repo.Task
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int) (repo.Task, error)); ok {
+		r0, r1 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(repo.Task)
+	}
+	return r0, r1
+}
 // NewRepository creates a new instance of Repository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewRepository(t interface {
