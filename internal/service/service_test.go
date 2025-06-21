@@ -28,6 +28,7 @@ func TestCreateTask(t *testing.T) {
 	// Инициализируем Fiber-контекст
 	app := fiber.New()
 	app.Post("/tasks", s.CreateTask)
+	app.Get("/tasks/:id", s.GetTaskById)
 
 	t.Run("успешное создание задачи", func(t *testing.T) {
 		task := TaskRequest{

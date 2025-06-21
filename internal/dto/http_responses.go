@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// DTO  некоторых компаниях используется такой подход
+// DTO некоторых компаниях используется такой подход
 
 const (
 	FieldBadFormat     = "FIELD_BADFORMAT"

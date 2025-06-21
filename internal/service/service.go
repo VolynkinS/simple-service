@@ -3,10 +3,12 @@ package service
 import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"simple-service/internal/dto"
 	"simple-service/internal/repo"
 	"simple-service/pkg/validator"
+	"strconv"
 )
 
 // Слой бизнес-логики. Тут должна быть основная логика сервиса
@@ -14,6 +16,7 @@ import (
 // Service - интерфейс для бизнес-логики
 type Service interface {
 	CreateTask(ctx *fiber.Ctx) error
+	GetTaskById(ctx *fiber.Ctx) error
 }
 
 type service struct {
@@ -50,6 +53,7 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 		Description: req.Description,
 	}
 	taskID, err := s.repo.CreateTask(ctx.Context(), task)
+	s.log.Info("taskID: ", taskID)
 	if err != nil {
 		s.log.Error("Failed to insert task", zap.Error(err))
 		return dto.InternalServerError(ctx)
@@ -61,5 +65,22 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 		Data:   map[string]int{"task_id": taskID},
 	}
 
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (s *service) GetTaskById(ctx *fiber.Ctx) error {
+	id, err := strconv.Atoi(ctx.Params("id"))
+	if err != nil {
+		return errors.Wrap(err, "failed to parse id")
+	}
+	task, err := s.repo.GetTaskById(ctx.Context(), id)
+	if err != nil {
+		s.log.Error("Failed to get task by id", zap.Error(err))
+		return errors.Wrap(err, "failed to get task by id")
+	}
+	response := dto.Response{
+		Status: "success",
+		Data:   task,
+	}
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
