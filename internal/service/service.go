@@ -73,7 +73,7 @@ func (s *service) GetTaskByID(ctx *fiber.Ctx) error {
 
 	//Проверка на валидность ID
 	id, err := strconv.Atoi(idStr)
-	if err != nil {
+	if err != nil || id <= 0 {
 		s.log.Error("Invalid ID format", zap.Error(err))
 		return dto.BadResponseError(ctx, dto.FieldBadFormat, "Invalid ID format")
 	}
@@ -82,7 +82,7 @@ func (s *service) GetTaskByID(ctx *fiber.Ctx) error {
 	task, err := s.repo.GetTaskByID(ctx.Context(), id)
 	if err != nil {
 		s.log.Error("Failed to get task", zap.Error(err))
-		return dto.BadResponseError(ctx, dto.TaskNotFound, err.Error())
+		return dto.NotFound(ctx, err.Error())
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(task)

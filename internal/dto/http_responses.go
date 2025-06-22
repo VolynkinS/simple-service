@@ -45,12 +45,12 @@ func InternalServerError(ctx *fiber.Ctx) error {
 	})
 }
 
-func NotFound(ctx *fiber.Ctx) error {
+func NotFound(ctx *fiber.Ctx, desc string) error {
 	return ctx.Status(fiber.StatusNotFound).JSON(Response{
 		Status: "error",
 		Error: &Error{
 			Code: TaskNotFound,
-			Desc: TaskNotFound,
+			Desc: desc,
 		},
 	})
 }

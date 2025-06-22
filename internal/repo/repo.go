@@ -16,7 +16,7 @@ import (
 // SQL-запрос на вставку задачи
 const (
 	insertTaskQuery = `INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id;`
-	getTaskQuery    = `SELECT * FROM tasks WHERE id = $1;`
+	getTaskQuery    = `SELECT id, title, description, status, created_at, updated_at FROM tasks WHERE id = $1;`
 )
 
 type repository struct {
