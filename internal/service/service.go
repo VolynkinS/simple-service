@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
-	"simple-service/internal/dto"
-	"simple-service/internal/repo"
-	"simple-service/pkg/validator"
+	"trainee/internal/dto"
+	repo2 "trainee/internal/repo"
+	"trainee/pkg/validator"
 )
 
 // Слой бизнес-логики. Тут должна быть основная логика сервиса
@@ -14,15 +14,16 @@ import (
 // Service - интерфейс для бизнес-логики
 type Service interface {
 	CreateTask(ctx *fiber.Ctx) error
+	GetTask(ctx *fiber.Ctx) error
 }
 
 type service struct {
-	repo repo.Repository
+	repo repo2.Repository
 	log  *zap.SugaredLogger
 }
 
 // NewService - конструктор сервиса
-func NewService(repo repo.Repository, logger *zap.SugaredLogger) Service {
+func NewService(repo repo2.Repository, logger *zap.SugaredLogger) Service {
 	return &service{
 		repo: repo,
 		log:  logger,
@@ -45,7 +46,7 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 	}
 
 	// Вставка задачи в БД через репозиторий
-	task := repo.Task{
+	task := repo2.Task{
 		Title:       req.Title,
 		Description: req.Description,
 	}
@@ -61,5 +62,33 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 		Data:   map[string]int{"task_id": taskID},
 	}
 
+	return ctx.Status(fiber.StatusOK).JSON(response)
+}
+
+func (s *service) GetTask(ctx *fiber.Ctx) error {
+	var taskReq TaskGetRequest
+
+	// Получение id задачи
+	taskReq = TaskGetRequest{ID: ctx.Params("id")}
+
+	// Валидация входных данных
+	if vErr := validator.Validate(ctx.Context(), taskReq); vErr != nil {
+		return dto.BadResponseError(ctx, dto.FieldIncorrect, vErr.Error())
+	}
+
+	// Получение задачи из БД через репозиторий
+	taskPtr, err := s.repo.GetTask(ctx.Context(), taskReq.ID)
+	if err != nil {
+		s.log.Error("Failed to get task", zap.Error(err))
+		return dto.InternalServerError(ctx)
+	}
+
+	// Формирование ответа
+	response := dto.Response{
+		Status: "success",
+		Data: map[string]any{"id": taskPtr.ID, "title": taskPtr.Title, "description": taskPtr.Description,
+			"status": taskPtr.Status, "created_at": taskPtr.Created_at, "updated_at": taskPtr.Updated_at,
+		},
+	}
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }

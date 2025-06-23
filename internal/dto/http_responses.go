@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"github.com/gofiber/fiber/v2"
-)
+import "github.com/gofiber/fiber/v2"
 
 // DTO  некоторых компаниях используется такой подход
 
