@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"testing"
 
+	"simple-service/internal/dto"
+	"simple-service/internal/repo"
+	"simple-service/internal/repo/mocks"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
-	"simple-service/internal/dto"
-	"simple-service/internal/repo"
-	"simple-service/internal/repo/mocks"
 )
 
 // TestCreateTask - тестирование метода CreateTask
