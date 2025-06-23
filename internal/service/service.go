@@ -68,7 +68,7 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 
 func (s *service) GetTaskById(ctx *fiber.Ctx) error {
 	id, err := ctx.ParamsInt("id")
-	if err != nil {
+	if err != nil || id < 1 {
 		s.log.Error("Invalid task ID", zap.Error(err))
 		return dto.BadResponseError(ctx, dto.FieldBadFormat, "Invalid task ID")
 	}
