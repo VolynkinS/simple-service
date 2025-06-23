@@ -4,7 +4,7 @@ import "time"
 
 // Task - структура, соответствующая таблице tasks
 type Task struct {
-	Id          int       `json:"id"`
+	Id          int       `json:"task_id"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Status      string    `json:"status"`
