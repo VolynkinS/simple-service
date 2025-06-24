@@ -5,6 +5,7 @@ Simple Service – это REST API-сервис, написанный на Go с
 Реализовано:
 
 - Создание задач через API
+- Получение задач по ID через API
 - Валидация входных данных
 - Логирование с использованием `zap`
 - Хранение данных в PostgreSQL
@@ -135,6 +136,28 @@ Authorization: Bearer your_secret_token
 }
 
 ```
+
+### **5.2 Получение задачи по ID**
+
+```
+GET http://localhost:8080/v1/task/{id}
+
+```
+
+**Ответ:**
+
+```
+{
+  "status": "success",
+  "data": {
+      "task_id": 1,
+      "title": "New Feature",
+      "description": "Develop new API endpoint"
+      "status": "done"
+      "created_at": "2025-06-23T15:08:26.413473Z",
+      "updated_at": "2025-06-23T15:08:26.413473Z"
+  }
+}
 
 ---
 
