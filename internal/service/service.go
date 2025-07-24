@@ -7,6 +7,7 @@ import (
 	"simple-service/internal/dto"
 	"simple-service/internal/repo"
 	"simple-service/pkg/validator"
+	"strconv"
 )
 
 // Слой бизнес-логики. Тут должна быть основная логика сервиса
@@ -14,6 +15,7 @@ import (
 // Service - интерфейс для бизнес-логики
 type Service interface {
 	CreateTask(ctx *fiber.Ctx) error
+	GetTask(ctx *fiber.Ctx) error
 }
 
 type service struct {
@@ -27,6 +29,26 @@ func NewService(repo repo.Repository, logger *zap.SugaredLogger) Service {
 		repo: repo,
 		log:  logger,
 	}
+}
+
+func (s *service) GetTask(ctx *fiber.Ctx) error {
+
+	if s == nil {
+		return ctx.Status(500).SendString("Service not initialized")
+	}
+
+	id_task := ctx.Query("id")
+	id, err := strconv.Atoi(id_task)
+	if err != nil {
+		return ctx.Status(400).SendString("Invalid ID")
+	}
+
+	task, err := s.repo.GetTask(ctx.Context(), id)
+	if err != nil {
+		return ctx.Status(500).SendString("DB error: " + err.Error())
+	}
+
+	return ctx.JSON(task)
 }
 
 // CreateTask - обработчик запроса на создание задачи
