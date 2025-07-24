@@ -1,73 +1,117 @@
 openapi: 3.0.0
 info:
-  title: Simple Service
-  description: API documentation for Simple Service project
-  version: 1.0.0
+  title: Simple Service API
+  version: "1.0"
+  description: API для создания и получения задач
 
 servers:
-  - url: http://localhost:8080
-    description: Local development server
+  - url: http://localhost:3000/v1
 
 paths:
-  /v1/tasks:
+  /create_task:
     post:
-      summary: Create a new task
-      description: Creates a new task in the system.
+      summary: Создание новой задачи
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - title
-              properties:
-                title:
-                  type: string
-                  example: "Implement new feature"
-                description:
-                  type: string
-                  example: "Develop a new API endpoint for user management"
+              $ref: '#/components/schemas/CreateTaskRequest'
+            examples:
+              Пример запроса:
+                value:
+                  title: "Написать документацию"
+                  description: "Добавить примеры в swagger.yaml"
       responses:
-        '201':
-          description: Task created successfully
+        '200':
+          description: Успешное создание
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    properties:
-                      task_id:
-                        type: integer
-                        example: 1
+                $ref: '#/components/schemas/TaskCreatedResponse'
+              examples:
+                Пример ответа:
+                  value:
+                    status: "success"
+                    data:
+                      id: 1
         '400':
-          description: Invalid request format
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  message:
-                    type: string
-                    example: "Invalid request body"
+          description: Ошибка валидации
         '500':
-          description: Internal server error
+          description: Внутренняя ошибка
+
+  /tasks:
+    get:
+      summary: Получение задачи по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ с задачей
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  message:
-                    type: string
-                    example: "Failed to insert task"
+                $ref: '#/components/schemas/GetTaskResponse'
+              examples:
+                Пример ответа:
+                  value:
+                    id: 1
+                    title: "Написать документацию"
+                    description: "Добавить примеры в swagger.yaml"
+                    status: "new"
+                    created_at: "2025-07-23T18:40:00Z"
+                    updated_at: "2025-07-24T00:01:00Z"
+        '404':
+          description: Задача не найдена
+        '500':
+          description: Ошибка сервера
+
+components:
+  schemas:
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: "Написать документацию"
+        description:
+          type: string
+          example: "Добавить примеры в swagger.yaml"
+
+    TaskCreatedResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+
+    GetTaskResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
