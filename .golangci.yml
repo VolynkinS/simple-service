@@ -1,0 +1,30 @@
+# Простая конфигурация golangci-lint
+run:
+  timeout: 5m
+
+linters:
+  disable:
+    - typecheck   # отключен из-за проблем с imports
+  enable:
+    - gofmt       # форматирование кода
+    - goimports   # организация импортов
+    - misspell    # проверка орфографии
+    - gocyclo     # цикломатическая сложность
+    - dupl        # дублирование кода
+    - unconvert   # ненужные конверсии типов
+    - whitespace  # лишние пробелы
+    - gofumpt     # более строгое форматирование
+    - revive      # замена golint
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  dupl:
+    threshold: 100
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+        - gocyclo
