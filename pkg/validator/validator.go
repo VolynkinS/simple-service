@@ -62,15 +62,25 @@ func parseValidationErrors(err error) error {
 
 	validationError := vErrors[0]
 	var validationErrorDescription string
+	field := validationError.Field()
+
 	switch validationError.Tag() {
 	case "tag":
 		validationErrorDescription = ErrInvalidFormat
 	case "required":
 		validationErrorDescription = ErrFieldRequired
 	case "max":
-		validationErrorDescription = ErrFieldExceedsMaxLen
+		if validationError.Kind().String() == "string" {
+			validationErrorDescription = ErrFieldExceedsMaxLen + " (max: " + validationError.Param() + " characters)"
+		} else {
+			validationErrorDescription = ErrFieldExceedsMaxVal
+		}
 	case "min":
-		validationErrorDescription = ErrFieldBelowMinLen
+		if validationError.Kind().String() == "string" {
+			validationErrorDescription = ErrFieldBelowMinLen + " (min: " + validationError.Param() + " characters)"
+		} else {
+			validationErrorDescription = ErrFieldBelowMinVal
+		}
 	case "lt", "lte":
 		validationErrorDescription = ErrFieldExceedsMaxVal
 	case "gt", "gte":
@@ -79,5 +89,5 @@ func parseValidationErrors(err error) error {
 		validationErrorDescription = ErrUnknownValidation
 	}
 
-	return errors.New(validationErrorDescription + ": " + validationError.Namespace())
+	return errors.New(validationErrorDescription + " for field: " + field)
 }

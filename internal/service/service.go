@@ -2,11 +2,12 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 	"simple-service/internal/dto"
 	"simple-service/internal/repo"
 	"simple-service/pkg/validator"
+
+	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 // Слой бизнес-логики. Тут должна быть основная логика сервиса
@@ -49,6 +50,7 @@ func (s *service) CreateTask(ctx *fiber.Ctx) error {
 		Title:       req.Title,
 		Description: req.Description,
 	}
+
 	taskID, err := s.repo.CreateTask(ctx.Context(), task)
 	if err != nil {
 		s.log.Error("Failed to insert task", zap.Error(err))

@@ -26,7 +26,7 @@ func NewRouters(r *Routers, token string) *fiber.App {
 	}))
 
 	// Группа маршрутов с авторизацией
-	apiGroup := app.Group("/v1", middleware.Authorization(token))
+	apiGroup := app.Group("/v1", middleware.JWTAuthorization(token))
 
 	// Роут для создания задачи
 	apiGroup.Post("/create_task", r.Service.CreateTask)

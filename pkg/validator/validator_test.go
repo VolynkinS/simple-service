@@ -33,37 +33,37 @@ func TestValidate(t *testing.T) {
 			name:       "Missing required field",
 			input:      TestStruct{TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 5},
 			wantErr:    true,
-			wantErrMsg: ErrFieldRequired + ": TestStruct.RequiredField",
+			wantErrMsg: ErrFieldRequired + " for field: RequiredField",
 		},
 		{
 			name:       "Invalid tag field",
 			input:      TestStruct{RequiredField: "value", TagField: "tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 5},
 			wantErr:    true,
-			wantErrMsg: ErrInvalidFormat + ": TestStruct.TagField",
+			wantErrMsg: ErrInvalidFormat + " for field: TagField",
 		},
 		{
 			name:       "Field exceeds max length",
 			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "toolong", MinField: "val", LtField: 5, GteField: 5},
 			wantErr:    true,
-			wantErrMsg: ErrFieldExceedsMaxLen + ": TestStruct.MaxField",
+			wantErrMsg: ErrFieldExceedsMaxLen + " (max: 5 characters) for field: MaxField",
 		},
 		{
 			name:       "Field below min length",
 			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "va", LtField: 5, GteField: 5},
 			wantErr:    true,
-			wantErrMsg: ErrFieldBelowMinLen + ": TestStruct.MinField",
+			wantErrMsg: ErrFieldBelowMinLen + " (min: 3 characters) for field: MinField",
 		},
 		{
 			name:       "Field exceeds max value",
 			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 15, GteField: 5},
 			wantErr:    true,
-			wantErrMsg: ErrFieldExceedsMaxVal + ": TestStruct.LtField",
+			wantErrMsg: ErrFieldExceedsMaxVal + " for field: LtField",
 		},
 		{
 			name:       "Field below min value",
 			input:      TestStruct{RequiredField: "value", TagField: "#tag", MaxField: "value", MinField: "val", LtField: 5, GteField: 3},
 			wantErr:    true,
-			wantErrMsg: ErrFieldBelowMinVal + ": TestStruct.GteField",
+			wantErrMsg: ErrFieldBelowMinVal + " for field: GteField",
 		},
 	}
 
