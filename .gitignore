@@ -21,8 +21,41 @@
 go.work
 go.work.sum
 
-# env file
+# Environment variables
 .env
+local.env
+
+# Build artifacts
+bin/
+build/
+dist/
 
 # IDE files
-.idea
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage directory
+coverage/
+*.cover
+*.coverage
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/

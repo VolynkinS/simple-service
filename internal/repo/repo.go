@@ -3,12 +3,13 @@ package repo
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors"
 
 	"simple-service/internal/config"
+	"simple-service/internal/service"
 )
 
 // Слой репозитория, здесь должны быть все методы, связанные с базой данных
@@ -22,16 +23,11 @@ type repository struct {
 	pool *pgxpool.Pool
 }
 
-// Repository - интерфейс с методом создания задачи
-type Repository interface {
-	CreateTask(ctx context.Context, task Task) (int, error) // Создание задачи
-}
-
 // NewRepository - создание нового экземпляра репозитория с подключением к PostgreSQL
-func NewRepository(ctx context.Context, cfg config.PostgreSQL) (Repository, error) {
+func NewRepository(ctx context.Context, cfg config.PostgreSQL) (*repository, error) {
 	// Формируем строку подключения
 	connString := fmt.Sprintf(
-		`user=%s password=%s host=%s port=%d dbname=%s sslmode=%s 
+		`user=%s password=%s host=%s port=%d dbname=%s sslmode=%s
         pool_max_conns=%d pool_max_conn_lifetime=%s pool_max_conn_idle_time=%s`,
 		cfg.User,
 		cfg.Password,
@@ -62,8 +58,18 @@ func NewRepository(ctx context.Context, cfg config.PostgreSQL) (Repository, erro
 	return &repository{pool}, nil
 }
 
+// Close - закрытие пула соединений
+func (r *repository) Close() {
+	r.pool.Close()
+}
+
+// Pool - получение пула соединений
+func (r *repository) Pool() *pgxpool.Pool {
+	return r.pool
+}
+
 // CreateTask - вставка новой задачи в таблицу tasks
-func (r *repository) CreateTask(ctx context.Context, task Task) (int, error) {
+func (r *repository) CreateTask(ctx context.Context, task service.Task) (int, error) {
 	var id int
 	err := r.pool.QueryRow(ctx, insertTaskQuery, task.Title, task.Description).Scan(&id)
 	if err != nil {

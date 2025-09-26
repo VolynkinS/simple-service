@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -14,6 +15,7 @@ import (
 	"simple-service/internal/api"
 	"simple-service/internal/config"
 	customLogger "simple-service/internal/logger"
+	"simple-service/internal/migrations"
 	"simple-service/internal/repo"
 	"simple-service/internal/service"
 )
@@ -41,11 +43,16 @@ func main() {
 		log.Fatal(errors.Wrap(err, "failed to initialize repository"))
 	}
 
+	// Применяем миграции
+	if err := migrations.RunMigrations(context.Background(), repository.Pool(), logger); err != nil {
+		log.Fatal(errors.Wrap(err, "failed to run migrations"))
+	}
+
 	// Создание сервиса с бизнес-логикой
 	serviceInstance := service.NewService(repository, logger)
 
 	// Инициализация API
-	app := api.NewRouters(&api.Routers{Service: serviceInstance}, cfg.Rest.Token)
+	app := api.NewRouters(&api.Routers{Service: serviceInstance, Logger: logger}, cfg.Rest.Token)
 
 	// Запуск HTTP-сервера в отдельной горутине
 	go func() {
@@ -61,4 +68,16 @@ func main() {
 	<-signalChan
 
 	logger.Info("Shutting down gracefully...")
+
+	// Graceful shutdown сервера
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := app.ShutdownWithContext(ctx); err != nil {
+		logger.Errorf("Server shutdown error: %v", err)
+	}
+
+	// Закрытие пула соединений с БД
+	repository.Close()
+	logger.Info("Server stopped gracefully")
 }
