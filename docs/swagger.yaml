@@ -1,0 +1,154 @@
+basePath: /
+definitions:
+  CreateTaskResponse:
+    description: Response after task creation
+    properties:
+      task_id:
+        example: 1
+        type: integer
+    type: object
+  Error:
+    description: Error details
+    properties:
+      code:
+        example: FIELD_INCORRECT
+        type: string
+      desc:
+        example: Invalid request body
+        type: string
+    type: object
+  ErrorResponse:
+    description: Error API response
+    properties:
+      error:
+        $ref: '#/definitions/Error'
+      status:
+        example: error
+        type: string
+    type: object
+  SuccessResponse:
+    description: Successful API response
+    properties:
+      data: {}
+      status:
+        example: success
+        type: string
+    type: object
+  TaskRequest:
+    description: Task creation request
+    properties:
+      description:
+        example: Develop a new API endpoint for user management
+        maxLength: 1000
+        type: string
+      title:
+        example: Implement new feature
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  TaskResponse:
+    description: Task information
+    properties:
+      created_at:
+        example: "2024-01-15T10:30:00Z"
+        type: string
+      description:
+        example: Develop a new API endpoint for user management
+        type: string
+      id:
+        example: 1
+        type: integer
+      status:
+        example: new
+        type: string
+      title:
+        example: Implement new feature
+        type: string
+      updated_at:
+        example: "2024-01-15T10:30:00Z"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API documentation for Simple Service project
+  title: Simple Service API
+  version: "1.0"
+paths:
+  /v1/create_task:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new task in the system
+      parameters:
+      - description: Task data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/TaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/CreateTaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create a new task
+      tags:
+      - tasks
+  /v1/tasks/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a task by its ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/TaskResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get task by ID
+      tags:
+      - tasks
+swagger: "2.0"

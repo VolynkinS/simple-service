@@ -14,9 +14,10 @@ import (
 
 // Слой репозитория, здесь должны быть все методы, связанные с базой данных
 
-// SQL-запрос на вставку задачи
+// SQL-запросы
 const (
 	insertTaskQuery = `INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING id;`
+	getTaskQuery    = `SELECT id, title, description, status, created_at, updated_at FROM tasks WHERE id = $1;`
 )
 
 type repository struct {
@@ -76,4 +77,24 @@ func (r *repository) CreateTask(ctx context.Context, task service.Task) (int, er
 		return 0, errors.Wrap(err, "failed to insert task")
 	}
 	return id, nil
+}
+
+// GetTask - получение задачи по ID
+func (r *repository) GetTask(ctx context.Context, id int) (*service.TaskResponse, error) {
+	var task service.TaskResponse
+	err := r.pool.QueryRow(ctx, getTaskQuery, id).Scan(
+		&task.ID,
+		&task.Title,
+		&task.Description,
+		&task.Status,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("task not found")
+		}
+		return nil, errors.Wrap(err, "failed to get task")
+	}
+	return &task, nil
 }

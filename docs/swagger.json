@@ -1,0 +1,233 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API documentation for Simple Service project",
+        "title": "Simple Service API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/v1/create_task": {
+            "post": {
+                "description": "Creates a new task in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Create a new task",
+                "parameters": [
+                    {
+                        "description": "Task data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/CreateTaskResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/tasks/{id}": {
+            "get": {
+                "description": "Retrieves a task by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Get task by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/TaskResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "CreateTaskResponse": {
+            "description": "Response after task creation",
+            "type": "object",
+            "properties": {
+                "task_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "Error": {
+            "description": "Error details",
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "FIELD_INCORRECT"
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "description": "Error API response",
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/Error"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                }
+            }
+        },
+        "SuccessResponse": {
+            "description": "Successful API response",
+            "type": "object",
+            "properties": {
+                "data": {},
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
+        "TaskRequest": {
+            "description": "Task creation request",
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "maxLength": 1000,
+                    "example": "Develop a new API endpoint for user management"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 1,
+                    "example": "Implement new feature"
+                }
+            }
+        },
+        "TaskResponse": {
+            "description": "Task information",
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:30:00Z"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Develop a new API endpoint for user management"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "new"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Implement new feature"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2024-01-15T10:30:00Z"
+                }
+            }
+        }
+    }
+}

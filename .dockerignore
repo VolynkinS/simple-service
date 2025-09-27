@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+CLAUDE.md
+plan.md
+
+# Environment files
+local.env
+.env
+
+# Binaries
+bin/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Dependency directories
+vendor/

@@ -1,0 +1,60 @@
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: simple-service-postgres
+    environment:
+      POSTGRES_DB: simple_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d simple_service"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - simple-service-network
+
+  app:
+    build: .
+    container_name: simple-service-app
+    environment:
+      # Database configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: simple_service
+      DB_USER: postgres
+      DB_PASSWORD: password123
+      DB_SSL_MODE: disable
+      DB_POOL_MAX_CONNS: 10
+      DB_POOL_MAX_CONN_LIFETIME: 300s
+      DB_POOL_MAX_CONN_IDLE_TIME: 180s
+
+      # Server configuration
+      PORT: ":8080"
+      WRITE_TIMEOUT: 30s
+      SERVER_NAME: simple-service
+      TOKEN: your-secret-token-here
+
+      # Logging
+      LOGLEVEL: info
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - simple-service-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  simple-service-network:
+    driver: bridge

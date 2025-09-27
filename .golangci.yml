@@ -1,20 +1,22 @@
-# Простая конфигурация golangci-lint
+# Конфигурация golangci-lint версии 2.x
+version: 2
+
 run:
   timeout: 5m
+  go: "1.24"
 
 linters:
-  disable:
-    - typecheck   # отключен из-за проблем с imports
   enable:
-    - gofmt       # форматирование кода
-    - goimports   # организация импортов
-    - misspell    # проверка орфографии
-    - gocyclo     # цикломатическая сложность
-    - dupl        # дублирование кода
-    - unconvert   # ненужные конверсии типов
-    - whitespace  # лишние пробелы
-    - gofumpt     # более строгое форматирование
-    - revive      # замена golint
+    - misspell # проверка орфографии
+    - gocyclo # цикломатическая сложность
+    - dupl # дублирование кода
+    - unconvert # ненужные конверсии типов
+    - whitespace # лишние пробелы
+    - govet # статический анализ
+    - ineffassign # неиспользуемые присваивания
+    - unused # неиспользуемый код
+  disable:
+    - revive # отключаем строгие правила документации
 
 linters-settings:
   gocyclo:
@@ -28,3 +30,6 @@ issues:
       linters:
         - dupl
         - gocyclo
+    - path: "internal/repo/mocks/"
+      linters:
+        - unused

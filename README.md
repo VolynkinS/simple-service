@@ -1,6 +1,78 @@
 ## **Описание проекта**
 
-Simple Service – это REST API-сервис, написанный на Go с использованием фреймворка Fiber и PostgreSQL. Сервис предоставляет базовый функционал для управления задачами.
+Simple Service
+
+## API Documentation
+
+Проект использует автоматическую генерацию Swagger документации из аннотаций в коде.
+
+### Просмотр документации
+
+1. **Онлайн**: Запустите сервис и перейдите по адресу `http://localhost:8080/swagger/`
+2. **Файл**: Откройте `docs/swagger.yaml` в Swagger Editor
+
+### Генерация документации
+
+```bash
+# Установка swag CLI (если не установлен)
+make swagger-install
+
+# Генерация документации из аннотаций
+make swagger-gen
+
+# Или напрямую
+swag init -g cmd/main.go -o docs
+```
+
+### Структура документации
+
+- `docs/swagger.yaml` - YAML спецификация
+- `docs/swagger.json` - JSON спецификация
+- `docs/docs.go` - Go код для встраивания
+
+### Добавление новых эндпоинтов
+
+1. Добавь аннотации к handler функции:
+```go
+// @Summary Краткое описание
+// @Description Подробное описание
+// @Tags тег
+// @Accept json
+// @Produce json
+// @Param request body dto.RequestType true "Описание параметра"
+// @Success 200 {object} dto.ResponseType
+// @Failure 400 {object} dto.ErrorResponse
+// @Router /v1/endpoint [post]
+func (h *Handler) Method(ctx *fiber.Ctx) error {
+    // код handler'а
+}
+```
+
+2. Создай DTO структуры в `internal/dto/`:
+```go
+// RequestType описание запроса
+// @Description Описание для Swagger
+type RequestType struct {
+    Field string `json:"field" example:"пример"`
+} // @name RequestType
+```
+
+3. Перегенерируй документацию:
+```bash
+make swagger-gen
+```
+
+### Команды Makefile
+
+```bash
+make swagger-gen     # Генерация документации
+make swagger-serve   # Информация о URL Swagger UI
+make build          # Сборка приложения
+make run            # Запуск приложения
+make all            # Полная сборка с документацией
+```
+
+## Simple Service – это REST API-сервис, написанный на Go с использованием фреймворка Fiber и PostgreSQL. Сервис предоставляет базовый функционал для управления задачами.
 
 Реализовано:
 
