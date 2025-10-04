@@ -56,7 +56,13 @@ func parseValidationErrors(err error) error {
 	}
 
 	vErrors, ok := err.(validator.ValidationErrors)
-	if !ok || len(vErrors) == 0 {
+	if !ok {
+		// Это InvalidValidationError или другая ошибка конфигурации валидатора
+		// Пропускать такие ошибки опасно - они могут привести к пропуску невалидных данных
+		return errors.New("validator configuration error: " + err.Error())
+	}
+
+	if len(vErrors) == 0 {
 		return nil
 	}
 

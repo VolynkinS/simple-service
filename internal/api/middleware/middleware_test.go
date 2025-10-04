@@ -59,16 +59,16 @@ func TestJWTAuthorization(t *testing.T) {
 			expectedBody:   `{"error":{"code":"UNAUTHORIZED","desc":"Authorization header is required"},"status":"error"}`,
 		},
 		{
-			name:           "Неправильный формат заголовка",
-			authHeader:     "Token " + validToken,
+			name:           "Неправильный формат заголовка - без пробела",
+			authHeader:     "Bearer" + validToken,
 			expectedStatus: 401,
 			expectedBody:   `{"error":{"code":"UNAUTHORIZED","desc":"Authorization header must start with 'Bearer '"},"status":"error"}`,
 		},
 		{
-			name:           "Пустой токен после Bearer",
-			authHeader:     "Bearer ",
+			name:           "Неправильный формат заголовка - другой префикс",
+			authHeader:     "Token " + validToken,
 			expectedStatus: 401,
-			expectedBody:   `{"error":{"code":"UNAUTHORIZED","desc":"Authorization token is required"},"status":"error"}`,
+			expectedBody:   `{"error":{"code":"UNAUTHORIZED","desc":"Authorization header must start with 'Bearer '"},"status":"error"}`,
 		},
 		{
 			name:           "Неправильная подпись токена",

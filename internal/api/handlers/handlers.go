@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"simple-service/internal/dto"
 	"simple-service/internal/service"
 	"simple-service/pkg/validator"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -52,9 +53,9 @@ func (h *TaskHandler) CreateTask(ctx *fiber.Ctx) error {
 		return dto.InternalServerError(ctx)
 	}
 
-	response := dto.Response{
+	response := dto.SuccessResponse{
 		Status: "success",
-		Data:   map[string]int{"task_id": taskID},
+		Data:   dto.CreateTaskResponse{TaskID: taskID},
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(response)
@@ -91,7 +92,7 @@ func (h *TaskHandler) GetTask(ctx *fiber.Ctx) error {
 		return dto.InternalServerError(ctx)
 	}
 
-	response := dto.Response{
+	response := dto.SuccessResponse{
 		Status: "success",
 		Data:   task,
 	}

@@ -16,32 +16,25 @@ func JWTAuthorization(secretKey string) fiber.Handler {
 			return unauthorizedResponse(c, "Authorization header is required")
 		}
 
-		if !strings.HasPrefix(authHeader, "Bearer") {
+		// Требуем точный префикс "Bearer " с пробелом
+		if !strings.HasPrefix(authHeader, "Bearer ") {
 			return unauthorizedResponse(c, "Authorization header must start with 'Bearer '")
 		}
 
-		// Обрабатываем случаи "Bearer" и "Bearer "
-		if authHeader == "Bearer" || authHeader == "Bearer " {
-			return unauthorizedResponse(c, "Authorization token is required")
-		}
-
 		// Извлекаем токен после "Bearer "
-		var token string
-		if strings.HasPrefix(authHeader, "Bearer ") {
-			token = strings.TrimSpace(authHeader[7:])
-		} else {
-			token = strings.TrimSpace(authHeader[6:])
-		}
-
+		token := strings.TrimSpace(authHeader[7:])
 		if token == "" {
 			return unauthorizedResponse(c, "Authorization token is required")
 		}
 
-		// Парсим JWT токен
-		parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		// Парсим JWT токен с проверкой алгоритма подписи
+		parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+			// Защита от "alg=none" и algorithm confusion атак
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrSignatureInvalid
+			}
 			return []byte(secretKey), nil
 		})
-
 		if err != nil {
 			return unauthorizedResponse(c, "Invalid authorization token")
 		}
