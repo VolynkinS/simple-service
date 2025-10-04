@@ -59,3 +59,9 @@ coverage/
 *.temp
 tmp/
 temp/
+
+# Go cache
+.gocache/
+
+# AI
+.claude/

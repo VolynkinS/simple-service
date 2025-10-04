@@ -9,7 +9,7 @@ import (
 const EnvPath = "local.env"
 
 type AppConfig struct {
-	LogLevel   string
+	LogLevel   string `envconfig:"LOG_LEVEL" default:"info"`
 	Rest       Rest
 	PostgreSQL PostgreSQL
 }
